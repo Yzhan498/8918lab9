@@ -1,0 +1,25 @@
+name: Terraform Verify
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+    branches:
+      - main
+      - master
+
+jobs:
+  terraform-validate-script:
+    name: Validate Terraform Script
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v2
+
+    - name: Terraform Validate Script
+      uses: cloudposse/terraform-github-actions/validate@master
+      with:
+        path: .

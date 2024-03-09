@@ -1,25 +1,69 @@
-name: Terraform Verify
+name: Validate Terraform
 
 on:
-  push:
-    branches:
-      - main
-      - master
   pull_request:
     branches:
       - main
       - master
 
+permissions:
+  id-token: write
+  contents: read
+
 jobs:
-  terraform-validate-script:
-    name: Validate Terraform Script
+  validate-terraform-fmt:
     runs-on: ubuntu-latest
-
+    name: Validate Terraform fmt
+    outputs:
+      CHECK_STATUS: "${{ env.CHECK_STATUS }}"
     steps:
-    - name: Checkout Repository
-      uses: actions/checkout@v3
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 2
+      - name: Fetch changed files
+        id: pr_files
+        uses: jitterbit/get-changed-files@v1
+        with:
+          format: "space-delimited"
+      - name: Configure Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.2.4
+      - name: Validate Terraform fmt (added_modified)
+        run: |
+          set +e
 
-    - name: Terraform Validate Script
-      uses: Yzhan498/8918lab9/validate@main
-      with:
-        path: .
+          echo "CHECK_STATUS=0" >> $GITHUB_ENV
+
+          for changed_file in ${{ steps.pr_files.outputs.added_modified }}; do
+            echo "Checking Terraform fmt on ${changed_file}..."
+
+            if [[ $changed_file == *.tf ]]; then
+              terraform fmt -check $changed_file
+              FMT_STATUS=$(echo $?)
+
+              if [[ $FMT_STATUS -ne 0 ]]; then
+                echo "❌ Terraform fmt failed - ${changed_file}" >> $GITHUB_STEP_SUMMARY
+                echo "CHECK_STATUS=1" >> $GITHUB_ENV
+              fi
+            fi
+          done
+      - name: Process check
+        if: always()
+        run: exit $CHECK_STATUS
+
+  validate-terraform:
+    runs-on: ubuntu-latest
+    name: Validate Terraform configuration
+    outputs:
+      CHECK_STATUS: "${{ env.CHECK_STATUS }}"
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 2
+      - name: Configure Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.2.4
+      - name: Validate Terraform configuration
+        run: terraform validate

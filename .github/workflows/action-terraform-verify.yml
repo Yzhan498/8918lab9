@@ -17,7 +17,7 @@ jobs:
 
     steps:
     - name: Checkout Repository
-      uses: Yzhan498/8918lab9/checkout@v3
+      uses: actions/checkout@v3
 
     - name: Terraform Validate Script
       uses: Yzhan498/8918lab9/validate@main

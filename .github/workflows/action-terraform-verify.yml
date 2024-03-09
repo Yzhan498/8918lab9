@@ -20,6 +20,6 @@ jobs:
       uses: actions/checkout@v3
 
     - name: Terraform Validate Script
-      uses: Yzhan498/8918lab9/Validate terraform fmt@commiterror
+      uses: Yzhan498/8918lab9/.github/workflows/action-terraform-verify@commiterror
       with:
         path: .

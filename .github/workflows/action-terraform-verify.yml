@@ -20,6 +20,6 @@ jobs:
       uses: actions/checkout@v2
 
     - name: Terraform Validate Script
-      uses: Yzhan498/8918lab9/validate@master
+      uses: Yzhan498/8918lab9/validate@main
       with:
         path: .

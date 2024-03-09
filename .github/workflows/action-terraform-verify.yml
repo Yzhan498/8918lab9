@@ -17,9 +17,9 @@ jobs:
 
     steps:
     - name: Checkout Repository
-      uses: action-terraform-verify/checkout@v2
+      uses: actions/checkout@v3
 
     - name: Terraform Validate Script
-      uses: Yzhan498/8918lab9/validate@main
+      uses: Yzhan498/8918lab9/Validate terraform fmt@commiterror
       with:
         path: .
